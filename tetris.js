@@ -93,34 +93,46 @@ Piece.prototype.unDraw = function() {
 // move the piece
 
 Piece.prototype.moveDown = function() {
-  this.unDraw()
-  this.y++
-  this.draw()
+  if(!this.collision(0,1,this.activeTetromino)) {
+    this.unDraw()
+    this.y++
+    this.draw()
+  } else {
+    // lock and gen nw piece
+  }
 }
 
 // move right
 
 Piece.prototype.moveRight = function() {
-  this.unDraw()
-  this.x++
-  this.draw()
+  if(!this.collision(1,0,this.activeTetromino)) {
+    this.unDraw()
+    this.x++
+    this.draw()
+
+  }
 }
 
 // move left
 
 Piece.prototype.moveLeft = function() {
-  this.unDraw()
-  this.x--
-  this.draw()
+  if(!this.collision(-1,0,this.activeTetromino)) {
+    this.unDraw()
+    this.x--
+    this.draw()
+  }
 }
 
 // rotate
 
 Piece.prototype.rotate = function() {
-  this.unDraw()
-  this.tetrominoN = (this.tetrominoN + 1) % this.tetromino.length
-  this.activeTetromino = this.tetromino[this.tetrominoN]
-  this.draw()
+  let nextPattern = this.tetromino[(this.tetrominoN + 1) % this.tetromino.length]
+  if(!this.colllision(0,0,nextPattern)) {
+    this.unDraw()
+    this.tetrominoN = (this.tetrominoN + 1) % this.tetromino.length
+    this.activeTetromino = this.tetromino[this.tetrominoN]
+    this.draw()
+  }
 }
 
 // collision check
@@ -135,8 +147,22 @@ Piece.prototype.collision = function(x, y, piece) {
       // coordinates of piece after movement
       let newX = this.x + c + x
       let newY = this.y + r + y
+
+      // conditions
+      if(newX < 0 || newX >= COL || newY >= ROW) {
+        return true
+      }
+      // skip newY < 0; board[-1] will crash game
+      if(newY < 0) {
+        continue
+      }
+      // check if there is a piece already locked
+      if(board[newY][newX] !== VACANT){
+        return true
+      }
     }
   }
+  return false
 }
 
 // control the piece
